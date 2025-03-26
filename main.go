@@ -11,6 +11,8 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+const defaultSocketPath = "/tmp/hashiru.sock"
+
 func main() {
 	app := &cli.Command{
 		Name:  "hashiru",
@@ -22,7 +24,7 @@ func main() {
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:    "socket",
-						Value:   "/tmp/hashiru.sock",
+						Value:   defaultSocketPath,
 						Usage:   "Unix domain socket path",
 						Aliases: []string{"s"},
 					},
@@ -37,7 +39,7 @@ func main() {
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:    "socket",
-						Value:   "/tmp/hashiru.sock",
+						Value:   defaultSocketPath,
 						Usage:   "Unix domain socket path",
 						Aliases: []string{"s"},
 					},
