@@ -1,9 +1,8 @@
-package main
+package server
 
 import (
 	"context"
-	"flag"
-	"log/slog"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -16,28 +15,19 @@ import (
 	"golang.org/x/net/http2/h2c"
 )
 
-func main() {
-	if err := run(context.Background()); err != nil {
-		slog.Error("Failed", "error", err)
-		os.Exit(1)
-	}
-}
-
-func run(ctx context.Context) error {
-	socketPath := flag.String("socket", "/tmp/hashiru.sock", "socket path")
-	flag.Parse()
-
+// Run starts the command execution server.
+func Run(ctx context.Context, socketPath string) error {
 	command := &command.CommandServer{}
 	mux := http.NewServeMux()
 	path, handler := hashiruv1connect.NewCommandServiceHandler(command)
 	mux.Handle(path, handler)
 
-	listener, err := net.Listen("unix", *socketPath)
+	listener, err := net.Listen("unix", socketPath)
 	if err != nil {
 		return err
 	}
-	defer os.Remove(*socketPath)
-	if err := os.Chmod(*socketPath, 0700); err != nil {
+	defer os.Remove(socketPath)
+	if err := os.Chmod(socketPath, 0700); err != nil {
 		return err
 	}
 
@@ -53,6 +43,6 @@ func run(ctx context.Context) error {
 		listener.Close()
 	}()
 
-	slog.Info("Starting server", "socket_path", *socketPath)
+	log.Printf("Starting server on %s", socketPath)
 	return server.Serve(listener)
 }

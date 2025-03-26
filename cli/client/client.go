@@ -1,12 +1,9 @@
-package main
+package client
 
 import (
 	"context"
 	"encoding/base64"
-	"errors"
-	"flag"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"os"
@@ -16,26 +13,12 @@ import (
 	"github.com/ryotarai/hashiru/gen/hashiru/v1/hashiruv1connect"
 )
 
-func main() {
-	if exitCode, err := run(context.Background()); err != nil {
-		log.Fatal(err)
-	} else {
-		os.Exit(exitCode)
-	}
-}
-
-func run(ctx context.Context) (int, error) {
-	socketPath := flag.String("socket", "/tmp/hashiru.sock", "socket path")
-	flag.Parse()
-
-	if len(flag.Args()) == 0 {
-		return 1, errors.New("no command provided")
-	}
-
+// Run executes a command through the server and returns the exit code.
+func Run(ctx context.Context, socketPath string, args []string) (int, error) {
 	httpClient := &http.Client{
 		Transport: &http.Transport{
 			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-				return net.Dial("unix", *socketPath)
+				return net.Dial("unix", socketPath)
 			},
 		},
 	}
@@ -51,15 +34,15 @@ func run(ctx context.Context) (int, error) {
 	}
 
 	req := &hashiruv1.RunCommandRequest{
-		Name: flag.Args()[0],
-		Args: flag.Args()[1:],
+		Name: args[0],
+		Args: args[1:],
 		Env:  os.Environ(),
 		Dir:  dir,
 	}
 
 	stream, err := client.RunCommand(ctx, connect.NewRequest(req))
 	if err != nil {
-		log.Fatal(err)
+		return 1, err
 	}
 
 	for stream.Receive() {
