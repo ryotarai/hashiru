@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
+	"log/slog"
 	"net"
 	"net/http"
 	"os"
@@ -18,7 +18,8 @@ import (
 
 func main() {
 	if err := run(context.Background()); err != nil {
-		log.Fatal(err)
+		slog.Error("Failed", "error", err)
+		os.Exit(1)
 	}
 }
 
@@ -33,7 +34,7 @@ func run(ctx context.Context) error {
 
 	listener, err := net.Listen("unix", *socketPath)
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		return err
 	}
 	defer os.Remove(*socketPath)
 	if err := os.Chmod(*socketPath, 0700); err != nil {
@@ -52,5 +53,6 @@ func run(ctx context.Context) error {
 		listener.Close()
 	}()
 
+	slog.Info("Starting server", "socket_path", *socketPath)
 	return server.Serve(listener)
 }
