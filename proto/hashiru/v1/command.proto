@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package hashiru.v1;
+
+option go_package = "github.com/ryotarai/hashiru/gen/hashiru/v1;hashiruv1";
+
+message RunCommandRequest {
+  string name = 1;
+  repeated string args = 2;
+  repeated string env = 3;
+  string dir = 4;
+}
+
+message RunCommandResponse {
+  oneof result {
+    string stdout_base64 = 1;
+    string stderr_base64 = 2;
+    int64 exit_code = 3;
+  }
+}
+
+service CommandService {
+  rpc RunCommand(RunCommandRequest) returns (stream RunCommandResponse) {}
+}
