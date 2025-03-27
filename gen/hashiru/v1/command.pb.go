@@ -93,8 +93,8 @@ type RunCommandResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Result:
 	//
-	//	*RunCommandResponse_StdoutBase64
-	//	*RunCommandResponse_StderrBase64
+	//	*RunCommandResponse_Stdout
+	//	*RunCommandResponse_Stderr
 	//	*RunCommandResponse_ExitCode
 	Result        isRunCommandResponse_Result `protobuf_oneof:"result"`
 	unknownFields protoimpl.UnknownFields
@@ -138,22 +138,22 @@ func (x *RunCommandResponse) GetResult() isRunCommandResponse_Result {
 	return nil
 }
 
-func (x *RunCommandResponse) GetStdoutBase64() string {
+func (x *RunCommandResponse) GetStdout() []byte {
 	if x != nil {
-		if x, ok := x.Result.(*RunCommandResponse_StdoutBase64); ok {
-			return x.StdoutBase64
+		if x, ok := x.Result.(*RunCommandResponse_Stdout); ok {
+			return x.Stdout
 		}
 	}
-	return ""
+	return nil
 }
 
-func (x *RunCommandResponse) GetStderrBase64() string {
+func (x *RunCommandResponse) GetStderr() []byte {
 	if x != nil {
-		if x, ok := x.Result.(*RunCommandResponse_StderrBase64); ok {
-			return x.StderrBase64
+		if x, ok := x.Result.(*RunCommandResponse_Stderr); ok {
+			return x.Stderr
 		}
 	}
-	return ""
+	return nil
 }
 
 func (x *RunCommandResponse) GetExitCode() int64 {
@@ -169,21 +169,21 @@ type isRunCommandResponse_Result interface {
 	isRunCommandResponse_Result()
 }
 
-type RunCommandResponse_StdoutBase64 struct {
-	StdoutBase64 string `protobuf:"bytes,1,opt,name=stdout_base64,json=stdoutBase64,proto3,oneof"`
+type RunCommandResponse_Stdout struct {
+	Stdout []byte `protobuf:"bytes,1,opt,name=stdout,proto3,oneof"`
 }
 
-type RunCommandResponse_StderrBase64 struct {
-	StderrBase64 string `protobuf:"bytes,2,opt,name=stderr_base64,json=stderrBase64,proto3,oneof"`
+type RunCommandResponse_Stderr struct {
+	Stderr []byte `protobuf:"bytes,2,opt,name=stderr,proto3,oneof"`
 }
 
 type RunCommandResponse_ExitCode struct {
 	ExitCode int64 `protobuf:"varint,3,opt,name=exit_code,json=exitCode,proto3,oneof"`
 }
 
-func (*RunCommandResponse_StdoutBase64) isRunCommandResponse_Result() {}
+func (*RunCommandResponse_Stdout) isRunCommandResponse_Result() {}
 
-func (*RunCommandResponse_StderrBase64) isRunCommandResponse_Result() {}
+func (*RunCommandResponse_Stderr) isRunCommandResponse_Result() {}
 
 func (*RunCommandResponse_ExitCode) isRunCommandResponse_Result() {}
 
@@ -197,10 +197,10 @@ const file_hashiru_v1_command_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
 	"\x04args\x18\x02 \x03(\tR\x04args\x12\x10\n" +
 	"\x03env\x18\x03 \x03(\tR\x03env\x12\x10\n" +
-	"\x03dir\x18\x04 \x01(\tR\x03dir\"\x8b\x01\n" +
-	"\x12RunCommandResponse\x12%\n" +
-	"\rstdout_base64\x18\x01 \x01(\tH\x00R\fstdoutBase64\x12%\n" +
-	"\rstderr_base64\x18\x02 \x01(\tH\x00R\fstderrBase64\x12\x1d\n" +
+	"\x03dir\x18\x04 \x01(\tR\x03dir\"q\n" +
+	"\x12RunCommandResponse\x12\x18\n" +
+	"\x06stdout\x18\x01 \x01(\fH\x00R\x06stdout\x12\x18\n" +
+	"\x06stderr\x18\x02 \x01(\fH\x00R\x06stderr\x12\x1d\n" +
 	"\texit_code\x18\x03 \x01(\x03H\x00R\bexitCodeB\b\n" +
 	"\x06result2a\n" +
 	"\x0eCommandService\x12O\n" +
@@ -240,8 +240,8 @@ func file_hashiru_v1_command_proto_init() {
 		return
 	}
 	file_hashiru_v1_command_proto_msgTypes[1].OneofWrappers = []any{
-		(*RunCommandResponse_StdoutBase64)(nil),
-		(*RunCommandResponse_StderrBase64)(nil),
+		(*RunCommandResponse_Stdout)(nil),
+		(*RunCommandResponse_Stderr)(nil),
 		(*RunCommandResponse_ExitCode)(nil),
 	}
 	type x struct{}

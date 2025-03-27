@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -29,12 +28,12 @@ func (w *commandStreamWriter) Write(p []byte) (int, error) {
 	resp := &hashiruv1.RunCommandResponse{}
 	switch w.dest {
 	case outputDestStdout:
-		resp.Result = &hashiruv1.RunCommandResponse_StdoutBase64{
-			StdoutBase64: base64.StdEncoding.EncodeToString(p),
+		resp.Result = &hashiruv1.RunCommandResponse_Stdout{
+			Stdout: p,
 		}
 	case outputDestStderr:
-		resp.Result = &hashiruv1.RunCommandResponse_StderrBase64{
-			StderrBase64: base64.StdEncoding.EncodeToString(p),
+		resp.Result = &hashiruv1.RunCommandResponse_Stderr{
+			Stderr: p,
 		}
 	default:
 		return 0, fmt.Errorf("invalid output destination: %s", w.dest)

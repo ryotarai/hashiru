@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"io"
 	"net"
@@ -55,15 +54,15 @@ func Run(ctx context.Context, socketPath string, args []string, workdir string) 
 
 	for stream.Receive() {
 		res := stream.Msg()
-		var base64Body string
 		var output io.Writer
+		var body []byte
 		switch res.Result.(type) {
-		case *hashiruv1.RunCommandResponse_StdoutBase64:
-			base64Body = res.GetStdoutBase64()
+		case *hashiruv1.RunCommandResponse_Stdout:
 			output = os.Stdout
-		case *hashiruv1.RunCommandResponse_StderrBase64:
-			base64Body = res.GetStderrBase64()
+			body = res.GetStdout()
+		case *hashiruv1.RunCommandResponse_Stderr:
 			output = os.Stderr
+			body = res.GetStderr()
 		case *hashiruv1.RunCommandResponse_ExitCode:
 			return int(res.GetExitCode()), nil
 		default:
@@ -71,11 +70,7 @@ func Run(ctx context.Context, socketPath string, args []string, workdir string) 
 		}
 
 		if output != nil {
-			decoded, err := base64.StdEncoding.DecodeString(base64Body)
-			if err != nil {
-				return exitCodeForError, err
-			}
-			if _, err := output.Write(decoded); err != nil {
+			if _, err := output.Write(body); err != nil {
 				return exitCodeForError, err
 			}
 		}
