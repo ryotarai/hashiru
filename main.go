@@ -43,12 +43,17 @@ func main() {
 						Usage:   "Unix domain socket path",
 						Aliases: []string{"s"},
 					},
+					&cli.StringFlag{
+						Name:    "workdir",
+						Usage:   "Working directory (default: current directory)",
+						Aliases: []string{"w"},
+					},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
 					if c.NArg() == 0 {
 						return errors.New("no command provided")
 					}
-					exitCode, err := client.Run(ctx, c.String("socket"), c.Args().Slice())
+					exitCode, err := client.Run(ctx, c.String("socket"), c.Args().Slice(), c.String("workdir"))
 					if err != nil {
 						return err
 					}

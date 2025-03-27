@@ -19,7 +19,7 @@ const (
 )
 
 // Run executes a command through the server and returns the exit code.
-func Run(ctx context.Context, socketPath string, args []string) (int, error) {
+func Run(ctx context.Context, socketPath string, args []string, workdir string) (int, error) {
 	httpClient := &http.Client{
 		Transport: &http.Transport{
 			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
@@ -33,16 +33,19 @@ func Run(ctx context.Context, socketPath string, args []string) (int, error) {
 		"http://unix",
 	)
 
+	if workdir == "" {
 		dir, err := os.Getwd()
 		if err != nil {
-		return 1, err
+			return exitCodeForError, err
+		}
+		workdir = dir
 	}
 
 	req := &hashiruv1.RunCommandRequest{
 		Name: args[0],
 		Args: args[1:],
 		Env:  os.Environ(),
-		Dir:  dir,
+		Dir:  workdir,
 	}
 
 	stream, err := client.RunCommand(ctx, connect.NewRequest(req))
